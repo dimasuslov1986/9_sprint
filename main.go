@@ -32,7 +32,9 @@ func generateRandomElements(size int) []int {
 // maximum returns the maximum number of elements.
 func maximum(data []int) int {
 	// ваш код здесь
-	if len(data) < 2 {
+	// в задании сказано: Обязательно обработайте крайние случаи, например, если был передан размер слайса,
+	// равный 0. но это же тоже не является проблемой. код отработает и вернет 0
+	if len(data) == 0 {
 		fmt.Println("ошибочный размер слайса")
 		return 0
 	}
@@ -43,64 +45,39 @@ func maximum(data []int) int {
 			max = data[i]
 		}
 	}
-	if max == 0 {
-		fmt.Println("ошибка: пустой слайс")
-		return 0
-	}
+
 	return max
 }
-
-var mu sync.Mutex
 
 // maxChunks returns the maximum number of elements in a chunks.
 func maxChunks(data []int) int {
 	// ваш код здесь
-	if len(data) < 2 {
+	if len(data) == 0 {
 		fmt.Println("ошибочный размер слайса")
 		return 0
 	}
 
-	// решил убрать проверку на "< 16" и "%8" потому что даже при невыполнении этих условий код работает корректно
-	// и находит наибольшее значение. будть то слайс {0, 1} или любой другой. ниже добавил проверку если все значения слайса == 0
-
-	//if len(data) < 16 {
-	//	fmt.Println("ошибочный размер слайса, количество элементов слайса недостаточно для корректного сравнения в 8 горутинах")
-	//	return 0
-	//}
-	//if len(data)%8 != 0 {
-	//	fmt.Println("ошибочный размер слайса, количество элементов слайса не кратно 8")
-	//	return 0
-	//}
 	var wg sync.WaitGroup
-	var max int
-	var slMaxCh []int
+
+	var arMaxCh [CHUNKS]int
 	for i := 0; i < CHUNKS; i++ {
 		wg.Add(1)
 
 		go func() {
 			slCh := data[i*len(data)/CHUNKS : (i+1)*len(data)/CHUNKS]
-			var maxCh int
-			for j := 0; j < len(slCh); j++ { // или range лучше?
-				if slCh[j] > maxCh {
-					maxCh = slCh[j]
-				}
-			}
-			mu.Lock()
-			slMaxCh = append(slMaxCh, maxCh)
-			mu.Unlock()
+
+			maxCh := maximum(slCh)
+
+			arMaxCh[i] = maxCh
+
 			wg.Done()
 		}()
 	}
 	wg.Wait()
-	for h := 0; h < len(slMaxCh); h++ {
-		if slMaxCh[h] > max {
-			max = slMaxCh[h]
-		}
-	}
-	if max == 0 {
-		fmt.Println("ошибка: пустой слайс")
-		return 0
-	}
+
+	slMaxCh := arMaxCh[:CHUNKS]
+
+	max := maximum(slMaxCh)
 
 	return max
 }
@@ -114,7 +91,7 @@ func main() {
 	// ваш код здесь
 	start := time.Now()
 	max := maximum(sl)
-	elapsed := time.Since(start) / time.Millisecond
+	elapsed := time.Since(start).Milliseconds()
 
 	fmt.Printf("Максимальное значение элемента: %d\nВремя поиска: %d ms\n", max, elapsed)
 
@@ -122,6 +99,6 @@ func main() {
 	// ваш код здесь
 	start = time.Now()
 	max = maxChunks(sl)
-	elapsed = time.Since(start) / time.Millisecond
+	elapsed = time.Since(start).Milliseconds()
 	fmt.Printf("Максимальное значение элемента: %d\nВремя поиска: %d ms\n", max, elapsed)
 }

@@ -18,31 +18,31 @@ func TestGenerateRandomElements(t *testing.T) {
 
 func TestMaximum(t *testing.T) {
 
-	x := maximum(make([]int, 0))
-	assert.Equal(t, 0, x)
+	data := []struct {
+		count []int
+		want  int
+	}{
+		{make([]int, 0), 0},
+		{[]int{0, 1, 2, 3, 4, 5}, 5},
+	}
 
-	x1 := maximum(make([]int, 1))
-	assert.Equal(t, 0, x1)
-
-	x2 := maximum(make([]int, 3))
-	assert.Equal(t, 0, x2)
-
-	sl3 := []int{0, 1, 2, 3, 4, 5}
-	x3 := maximum(sl3)
-	assert.Equal(t, 5, x3)
+	for _, v := range data {
+		x := maximum(v.count)
+		assert.Equal(t, v.want, x)
+	}
 }
 
 func TestMaxChunks(t *testing.T) {
-	x := maximum(make([]int, 0))
-	assert.Equal(t, 0, x)
+	data := []struct {
+		count []int
+		want  int
+	}{
+		{make([]int, 0), 0},
+		{[]int{0, 1, 2, 3, 4, 5}, 5},
+	}
 
-	x1 := maximum(make([]int, 1))
-	assert.Equal(t, 0, x1)
-
-	x2 := maximum(make([]int, 3))
-	assert.Equal(t, 0, x2)
-
-	sl4 := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23}
-	x4 := maximum(sl4)
-	assert.Equal(t, 23, x4)
+	for _, v := range data {
+		x := maxChunks(v.count)
+		assert.Equal(t, v.want, x)
+	}
 }
